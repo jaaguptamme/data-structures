@@ -2,38 +2,40 @@
 
 using namespace std;
 typedef long long ll;
+template<typename T>
 struct ST{
-    vector<vector<int>>mn;
+    vector<vector<T>>mn;
     vector<int>lg;
     ST(){}
-    ST(vector<int>& A){
+    ST(vector<T>& A){
         int n=A.size();
         lg.resize(n+1,0);
         for(int i=1;i<=n;i++)lg[i]=log2(i);
         int m=log2(n);
-        mn.resize(m+1,vector<int>(n,0));
+        mn.resize(m+1,vector<T>(n));
         for(int i=0;i<n;i++)mn[0][i]=A[i];
         for(int j=1;j<=m;j++){
             for(int i=0;i+(1<<j)<=n;i++)mn[j][i]=min(mn[j-1][i],mn[j-1][i+(1<<(j-1))]);
         }
     }
-    int get(int s,int e){
+    T get(int s,int e){
         int ln=lg[e+1-s];
         return min(mn[ln][s],mn[ln][e+1-(1<<ln)]);
     }
 };
+template<typename T>
 struct FH{
-    ST sparse_table;
+    ST<T> sparse_table;
     int b;
-    vector<int>W;
+    vector<T>W;
     unordered_map<int,vector<vector<int>>>mns;
     vector<int>treenum;
-    FH(vector<int>& vals){
+    FH(vector<T>& vals){
         W=vals;
         int n=vals.size();
         b=max(1.0,(log2(n)+3)/4);
-        vector<int>current;
-        vector<int>global;
+        vector<T>current;
+        vector<T>global;
         for(int i=0;i<n;i++){
             current.push_back(vals[i]);
             if((i+1)%b==0 || i==n-1){
@@ -44,10 +46,10 @@ struct FH{
                 current={};
             }
         }
-        sparse_table=ST(global);
+        sparse_table=ST<T>(global);
     }
-    int calc(vector<int>& A){
-        deque<int>dq;
+    int calc(vector<T>& A){
+        deque<T>dq;
         int res=0;
         int place=2*b-1;
         for(auto el:A){
@@ -61,7 +63,7 @@ struct FH{
         }
         return res;
     }
-    void build(vector<int>& A,int vl){
+    void build(vector<T>& A,int vl){
         vector<vector<int>>R;
         A.resize(b);
         R.resize(b,vector<int>(b,0));
@@ -71,7 +73,7 @@ struct FH{
         }
         mns[vl]=R;
     }
-    int get(int i,int j){
+    T get(int i,int j){
         int bi=i/b,bj=j/b;
         if(i>j)exit(0);
         if(bi==bj){
@@ -81,13 +83,13 @@ struct FH{
             return W[bi*b+V[ii][ij]];
         }
         else if(bi+1==bj){
-            int left=W[bi*b+mns[treenum[bi]][i%b][b-1]];
-            int right=W[bj*b+mns[treenum[bj]][0][j%b]];
+            T left=W[bi*b+mns[treenum[bi]][i%b][b-1]];
+            T right=W[bj*b+mns[treenum[bj]][0][j%b]];
             return min(left,right);
         }else{
-            int left=W[bi*b+mns[treenum[bi]][i%b][b-1]];
-            int right=W[bj*b+mns[treenum[bj]][0][j%b]];
-            int mid=sparse_table.get(bi+1,bj-1);
+            T left=W[bi*b+mns[treenum[bi]][i%b][b-1]];
+            T right=W[bj*b+mns[treenum[bj]][0][j%b]];
+            T mid=sparse_table.get(bi+1,bj-1);
             return min(left,min(mid,right));
         }
     }
@@ -95,12 +97,12 @@ struct FH{
 int main()
 {ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);
     int n,q;
-    vector<int>a;//={1};
+    vector<int>a;
     cin>>n>>q;
     for(int i=0;i<n;i++){
         int el;cin>>el;a.push_back(el);
     }
-    FH t=FH(a);
+    FH<int> t=FH<int>(a);
     /*for(int i=0;i<a.size();i++){
         for(int j=i;j<a.size();j++){
             cout<<i<<' '<<j<<' '<<t.get(i,j)<<'\n';
