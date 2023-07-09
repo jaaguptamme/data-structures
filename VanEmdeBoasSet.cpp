@@ -9,7 +9,6 @@ class vEB{
     int min,max;
     vEB* summary;
     vector<vEB*> childs;
-
     int low(int x){
         return x&mask;
     }
@@ -31,7 +30,6 @@ class vEB{
         childs=vector<vEB*>(root,nullptr);
         for(int i=0;i<root;i++)childs[i]=new vEB(root);
     }
-
     void _insert(int x){
         if(is_empty()){
             min=max=x;
@@ -44,13 +42,11 @@ class vEB{
         if(childs[i]->min==NON)summary->_insert(i);
         childs[i]->_insert(j);
     }
-
     bool _lookup(int x){
         if(min==x or max==x)return true;
         if(indexed_elements==2)return false;
         return childs[high(x)]->_lookup(low(x));
     }
-
     int _succ(int x){
         if(is_empty())return NON;
         if(indexed_elements==2 and x==0 and max==1)return 1;
@@ -67,7 +63,6 @@ class vEB{
         }
         return ind(i,j);
     }
-
     int _pred(int x){
         if(is_empty())return NON;
         if(indexed_elements==2 and x==1 and min==0)return 0;
@@ -85,7 +80,6 @@ class vEB{
         }
         return ind(i,j);
     }
-
     void _erase(int x){
         if(min==x and max==x){
             min=max=NON;
@@ -119,49 +113,32 @@ class vEB{
             }
           }
     }
-
     public:
-
     int pred(int x){
         if(x>=indexed_elements)return max;
         if(x<0)return NON;
         return _pred(x);
     }
-
     int succ(int x){
         if(x>=indexed_elements)return NON;
         if(x<0)return min;
         return _succ(x);
     }
-
     bool lookup(int x){
         if(x<0||x>= indexed_elements)return false;
         return _lookup(x);
     }
-
     void insert (int x){
         if(lookup(x))return;
         _insert(x);
     }
-
-    int min_element(){
-        return min;
-    }
-
-    int max_element(){
-        return max;
-    }
-
-    int is_empty(){
-        return min==NON;
-    }
-
+    int min_element(){return min;}
+    int max_element(){return max;}
+    int is_empty(){return min==NON;}
     void erase(int x){
         if(!lookup(x))return;
         _erase(x);
     }
-
-
     vEB (int number_elements){
         halfbitcnt=log2(2*number_elements-1);
         if(halfbitcnt<1)halfbitcnt=1;
@@ -174,6 +151,4 @@ class vEB{
         mask=(1<<halfbitcnt)-1;
         build();
     }
-
-
 };
