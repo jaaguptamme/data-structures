@@ -5,14 +5,16 @@ template<typename T>
 struct SkipList{
     private:
     struct Node{
-        vector<Node*> next;
+        Node** next;
         T val;
         Node(T val,int level){
-            next.resize(level);
+            next=new Node*[level];
+            for(int i=0;i<level;i++)next[i]=nullptr;
             this->val=val;
         }
         Node(int level){
-            next.resize(level);
+            next=new Node*[level];
+            for(int i=0;i<level;i++)next[i]=nullptr;
         }
     };
     Node* _head=new Node(33);
@@ -111,22 +113,3 @@ struct SkipList{
     }
 
 };
-int main()
-{ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);
-    SkipList<int> vals;
-    for(int i=5;i<10;i++){
-        vals.insert(i);
-        cout<<i<<' '<<vals.max_element()<<' '<<vals.min_element()<<endl;
-    }
-    vector<int>V=vals.to_vec();
-    for(auto el:V)cout<<el<<'+';
-    cout<<endl;
-    for(int i=0;i<10;i++){
-        cout<<vals.succ(i)<<' ';
-    }
-
-    for(int i=0;i<10;i++){
-        cout<<vals.remove(i)<<' '<<' '<<vals.get_size()<<endl;
-    }
-    return 0;
-}
