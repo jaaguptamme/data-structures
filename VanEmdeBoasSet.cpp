@@ -8,7 +8,7 @@ class vEB{
     int halfbitcnt,mask;
     int min,max;
     vEB* summary;
-    vector<vEB*> childs;
+    vEB** childs;
     int low(int x){
         return x&mask;
     }
@@ -22,12 +22,12 @@ class vEB{
         min=max=NON;
         if(indexed_elements==2){
             summary=nullptr;
-            childs=vector<vEB*>(0,nullptr);
+            //childs=vector<vEB*>(0,nullptr);
             return;
         }
         int root=(1<<halfbitcnt);
         summary=new vEB(root);
-        childs=vector<vEB*>(root,nullptr);
+        childs=new vEB*[root];
         for(int i=0;i<root;i++)childs[i]=new vEB(root);
     }
     void _insert(int x){
