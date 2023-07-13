@@ -1,22 +1,22 @@
 #include <bits/stdc++.h>
 typedef long long ll;
 using namespace std;
-const int INF=INT_MAX,NON=-INF;
+const int INF=INT_MAX,NON=-INF,SMALL=63;
 class vEB{
     private:
-    int active_elements,indexed_elements;
-    int halfbitcnt,mask;
+    int indexed_elements;
+    int SQRT;
     int min,max;
     vEB* summary;
     vEB** childs;
     int low(int x){
-        return x&mask;
+        return x%SQRT;
     }
     int high(int x){
-        return x>>halfbitcnt;
+        return x/SQRT;
     }
     int ind(int i,int j){
-        return (i<<halfbitcnt)|j;
+        return (i*SQRT)+j;
     }
      void build(){
         min=max=NON;
@@ -25,7 +25,7 @@ class vEB{
             //childs=vector<vEB*>(0,nullptr);
             return;
         }
-        int root=(1<<halfbitcnt);
+        int root=SQRT;
         summary=new vEB(root);
         childs=new vEB*[root];
         for(int i=0;i<root;i++)childs[i]=new vEB(root);
@@ -140,15 +140,41 @@ class vEB{
         _erase(x);
     }
     vEB (int number_elements){
-        halfbitcnt=log2(2*number_elements-1);
-        if(halfbitcnt<1)halfbitcnt=1;
-        indexed_elements=1<<halfbitcnt;
-        if(halfbitcnt%2){
+        SQRT=sqrt(number_elements)+1;
+        indexed_elements=number_elements;
+        /*if(halfbitcnt%2){
             halfbitcnt/=2;halfbitcnt++;
         }else{
             halfbitcnt/=2;
         }
-        mask=(1<<halfbitcnt)-1;
+        mask=(1<<halfbitcnt)-1;*/
         build();
     }
 };
+
+void prindi(vEB &see){
+    int u=see.max_element();
+    while(u!=NON){
+        cout<<u<<' ';
+        u=see.pred(u);
+    }
+    cout<<'\n';
+}
+int main()
+{ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);
+    const int N=10*1000*1000;
+    vEB v(N);
+    for(int i=0;i<=10;i++){
+        v.insert(i);
+        prindi(v);
+    }
+    for(int i=0;i<=N;i++){
+        v.insert(i);
+        prindi(v);
+    }
+    for(int i=0;i<=20;i++){
+        v.erase(i);
+        prindi(v);
+    }
+    return 0;
+}
