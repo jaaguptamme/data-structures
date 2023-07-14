@@ -166,9 +166,18 @@ class vEB{
             bits=0;
             return;
         }
-        summary=new vEB(SQRT);
-        childs=new vEB*[SQRT];
-        for(int i=0;i<SQRT;i++)childs[i]=new vEB(SQRT);
+        if(indexed_elements<SMALL*SMALL){
+            int mitu=(indexed_elements+SMALL-1)/SMALL;
+            summary=new vEB(mitu);
+            childs=new vEB*[mitu];
+            SQRT=SMALL;
+            for(int i=0;i<mitu;i++)childs[i]=new vEB(SMALL);
+        }
+        else{
+            summary=new vEB(SQRT);
+            childs=new vEB*[SQRT];
+            for(int i=0;i<SQRT;i++)childs[i]=new vEB(SQRT);
+        }
     }
 };
 
