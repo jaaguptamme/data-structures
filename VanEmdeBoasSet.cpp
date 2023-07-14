@@ -7,6 +7,7 @@ class vEB{
     int indexed_elements;
     int SQRT;
     int min,max;
+    ll bits;
     vEB* summary;
     vEB** childs;
     int low(int x){
@@ -18,39 +19,57 @@ class vEB{
     int ind(int i,int j){
         return (i*SQRT)+j;
     }
-     void build(){
-        min=max=NON;
-        if(indexed_elements==2){
-            summary=nullptr;
-            //childs=vector<vEB*>(0,nullptr);
+
+    int calc_min(){
+        if(bits==0)return NON;
+        return 63 - __builtin_clzll(bits & -bits);
+    }
+
+    int calc_max(){
+        if(bits==0)return NON;
+        return 63 - __builtin_clzll(bits);
+    }
+
+    void _insert(int x){
+        if(indexed_elements<=SMALL){
+            bits|=(1LL)<<x;
+            min=calc_min();
+            max=calc_max();
             return;
         }
-        int root=SQRT;
-        summary=new vEB(root);
-        childs=new vEB*[root];
-        for(int i=0;i<root;i++)childs[i]=new vEB(root);
-    }
-    void _insert(int x){
         if(is_empty()){
             min=max=x;
             return;
         }
         if(x<min)swap(x,min);
         if(x>max)max=x;
-        if(indexed_elements==2)return;
         int i=high(x),j=low(x);
         if(childs[i]->min==NON)summary->_insert(i);
         childs[i]->_insert(j);
     }
     bool _lookup(int x){
+        if(indexed_elements<=SMALL){
+            return bits&((1LL)<<x);
+        }
         if(min==x or max==x)return true;
-        if(indexed_elements==2)return false;
         return childs[high(x)]->_lookup(low(x));
     }
+
+    int _next_low(int x){
+        ll b=bits&~(((1LL)<<(x+1))-1);
+        if(b==0)return NON;
+        return 63 - __builtin_clzll(b & -b);
+    }
+
+    int _next_high(int x){
+        ll b=bits&(((1LL)<<(x))-1);
+        if(b==0)return NON;
+        return 63 - __builtin_clzll(b);
+    }
+
     int _succ(int x){
+        if(indexed_elements<=SMALL)return _next_low(x);
         if(is_empty())return NON;
-        if(indexed_elements==2 and x==0 and max==1)return 1;
-        if(indexed_elements==2)return NON;
         if(x<min)return min;
         if(x>max)return NON;
         int i=high(x),j=low(x);
@@ -64,9 +83,8 @@ class vEB{
         return ind(i,j);
     }
     int _pred(int x){
+        if(indexed_elements<=SMALL)return _next_high(x);
         if(is_empty())return NON;
-        if(indexed_elements==2 and x==1 and min==0)return 0;
-        if(indexed_elements==2)return NON;
         if(max<x)return max;
         if(x<min)return NON;
         int i=high(x),j=low(x);
@@ -81,14 +99,14 @@ class vEB{
         return ind(i,j);
     }
     void _erase(int x){
-        if(min==x and max==x){
-            min=max=NON;
+        if(indexed_elements<=SMALL){
+            bits&=~((1LL)<<x);
+            min=calc_min();
+            max=calc_max();
             return;
         }
-        if(indexed_elements==2){
-            if(x==0)min=1;
-            if(x==1)min=0;
-            max=min;
+        if(min==x and max==x){
+            min=max=NON;
             return;
         }
         if (x==min) {
@@ -140,15 +158,17 @@ class vEB{
         _erase(x);
     }
     vEB (int number_elements){
-        SQRT=sqrt(number_elements)+1;
+        SQRT=sqrt(number_elements);
+        if(SQRT*SQRT<number_elements)SQRT++;
         indexed_elements=number_elements;
-        /*if(halfbitcnt%2){
-            halfbitcnt/=2;halfbitcnt++;
-        }else{
-            halfbitcnt/=2;
+        min=max=NON;
+        if(indexed_elements<=SMALL){
+            bits=0;
+            return;
         }
-        mask=(1<<halfbitcnt)-1;*/
-        build();
+        summary=new vEB(SQRT);
+        childs=new vEB*[SQRT];
+        for(int i=0;i<SQRT;i++)childs[i]=new vEB(SQRT);
     }
 };
 
@@ -162,19 +182,24 @@ void prindi(vEB &see){
 }
 int main()
 {ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);
-    const int N=10*1000*1000;
+    const int N=100*1000*1000;
     vEB v(N);
-    for(int i=0;i<=10;i++){
+    /*for(int i=0;i<N;i+=N/19){
         v.insert(i);
         prindi(v);
-    }
-    for(int i=0;i<=N;i++){
+    }*/
+    for(int i=0;i<N;i++){
+        assert(!v.lookup(i));
         v.insert(i);
-        prindi(v);
+        assert(v.lookup(i));
+        //prindi(v);
     }
-    for(int i=0;i<=20;i++){
+    for(int i=0;i<N;i++){
+        assert(v.lookup(i));
         v.erase(i);
-        prindi(v);
+        assert(!v.lookup(i));
+        //prindi(v);
     }
+    prindi(v);
     return 0;
 }
