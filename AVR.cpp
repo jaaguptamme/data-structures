@@ -167,6 +167,16 @@ class AVL{
         return _contains(root,key);
     }
 
+    T get_kth(AVL_node* root,int k){
+        if(suurus(root->l)+1==k)return root->info;
+        if(suurus(root->l)>=k)return get_kth(root->l,k);
+        return get_kth(root->r,k-1-suurus(root->l));
+    }
+
+    T get_kth(int k){
+        return get_kth(root,k);
+    }
+
 };
 int main()
 {ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);
@@ -176,7 +186,7 @@ int main()
     for(int i=1;i<=N;i++){
         t.insert(i,1);
     }
-    for(int i=1;i<=N;i++)assert(t.contains(i)==true);
+    for(int i=1;i<=N;i++)assert(t.get_kth(i)==i);
     //t.prindi();
     /*for(int i=1;i<=N;i++){
         for(int j=i;j<=N;j++){
@@ -188,7 +198,7 @@ int main()
         int l=(rand()*rand())%N+1;
         int r=(rand()*rand())%N+1;
         if(l>r)swap(l,r);
-        assert(t.getSegmentSum(t.root,l,r)==(r-l+1));
+        assert(t.getSegmentSumBetweenVals(t.root,l,r)==(r-l+1));
     }
     //t.prindi();
     return 0;
