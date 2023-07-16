@@ -156,14 +156,27 @@ class AVL{
         return summa;
     }
 
+    bool _contains(AVL_node* root, T& key){
+        if(root==NULL)return false;
+        if(root->info==key)return true;
+        if(root->info>key)return _contains(root->l,key);
+        return _contains(root->r,key);
+    }
+
+    bool contains(T key){
+        return _contains(root,key);
+    }
+
 };
 int main()
 {ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);
     const int N=1000*1000;
     AVL<int,int> t;
+    for(int i=1;i<=N;i++)assert(t.contains(i)==false);
     for(int i=1;i<=N;i++){
         t.insert(i,1);
     }
+    for(int i=1;i<=N;i++)assert(t.contains(i)==true);
     //t.prindi();
     /*for(int i=1;i<=N;i++){
         for(int j=i;j<=N;j++){
