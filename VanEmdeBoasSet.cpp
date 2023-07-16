@@ -2,52 +2,51 @@
 typedef long long ll;
 using namespace std;
 const int INF=INT_MAX,NON=-INF,SMALL=63;
+const ll ONE=1LL;
 class genericvEB{
     public:
-    int min,max;
     virtual void _insert(int x)=0;
     virtual void _erase(int x)=0;
     virtual bool _lookup(int x)=0;
     virtual int _succ(int x)=0;
     virtual int _pred(int x)=0;
+    virtual int get_min()=0;
+    virtual int get_max()=0;
 };
 class smallvEB: public genericvEB{
     public:
     ll bits;
     smallvEB(){
         bits=0;
-        min=max=NON;
     }
     int _next_low(int x){
-        ll b=bits&~(((1LL)<<(x+1))-1);
+        ll b=bits&~((ONE<<(x+1))-1);
         if(b==0)return NON;
         return 63 - __builtin_clzll(b & -b);
     }
 
     int _next_high(int x){
-        ll b=bits&(((1LL)<<(x))-1);
+        ll b=bits&((ONE<<(x))-1);
         if(b==0)return NON;
         return 63 - __builtin_clzll(b);
     }
-    int calc_min(){
+    int get_min(){
         if(bits==0)return NON;
         return 63 - __builtin_clzll(bits & -bits);
     }
 
-    int calc_max(){
+    int get_max(){
         if(bits==0)return NON;
         return 63 - __builtin_clzll(bits);
     }
 
      void _insert(int x){
         bits|=(1LL)<<x;
-        min=calc_min();
-        max=calc_max();
         return;
      }
 
      bool _lookup(int x){
-        return bits&((1LL)<<x);
+        return bits&(ONE<<x);
      }
 
      int _succ(int x){
@@ -59,15 +58,13 @@ class smallvEB: public genericvEB{
      }
 
      void _erase(int x){
-        bits&=~((1LL)<<x);
-        min=calc_min();
-        max=calc_max();
+        bits&=~(ONE<<x);
      }
 };
 class vEB: public genericvEB{
     private:
-    int indexed_elements;
     int SQRT;
+    int min,max;
     genericvEB* summary;
     genericvEB** childs;
     int low(int x){
@@ -88,7 +85,7 @@ class vEB: public genericvEB{
         if(x<min)swap(x,min);
         if(x>max)max=x;
         int i=high(x),j=low(x);
-        if(childs[i]->min==NON)summary->_insert(i);
+        if(childs[i]->get_min()==NON)summary->_insert(i);
         childs[i]->_insert(j);
     }
     bool _lookup(int x){
@@ -101,12 +98,12 @@ class vEB: public genericvEB{
         if(x<min)return min;
         if(x>max)return NON;
         int i=high(x),j=low(x);
-        if(j<childs[i]->max){
+        if(j<childs[i]->get_max()){
             j=childs[i]->_succ(j);
         }else{
             i=summary->_succ(i);
             if(i==NON)return NON;
-            j=childs[i]->min;
+            j=childs[i]->get_max();
         }
         return ind(i,j);
     }
@@ -115,13 +112,13 @@ class vEB: public genericvEB{
         if(max<x)return max;
         if(x<min)return NON;
         int i=high(x),j=low(x);
-        if(childs[i]->min!=NON and childs[i]->min<j){
+        if(childs[i]->get_min()!=NON and childs[i]->get_min()<j){
             j=childs[i]->_pred(j);
         }else{
             i=summary->_pred(i);
             if(i==NON and min<x)return min;
             if(i==NON)return NON;
-            j=childs[i]->max;
+            j=childs[i]->get_max();
         }
         return ind(i,j);
     }
@@ -131,48 +128,46 @@ class vEB: public genericvEB{
             return;
         }
         if (x==min) {
-            int cur=summary->min;
+            int cur=summary->get_min();
             if(cur==NON) {
               min=max=NON;
               return;
             }
-            x=min=ind(cur,childs[cur]->min);
+            x=min=ind(cur,childs[cur]->get_min());
           }
           int i=high(x),j=low(x);
           childs[i]->_erase(j);
-          if (childs[i]->min==NON) {
+          if (childs[i]->get_min()==NON) {
             summary->_erase(i);
           }
           if(x==max) {
-            if(summary->max==NON) {
+            if(summary->get_max()==NON) {
               max=min;
             } else {
-              int cur=summary->max;
-              max=ind(cur,childs[cur]->max);
+              int cur=summary->get_max();
+              max=ind(cur,childs[cur]->get_max());
             }
           }
     }
     public:
     int pred(int x){
-        if(x>=indexed_elements)return max;
+        if(x>=SQRT*SQRT)return max;
         if(x<0)return NON;
         return _pred(x);
     }
     int succ(int x){
-        if(x>=indexed_elements)return NON;
+        if(x>=SQRT*SQRT)return NON;
         if(x<0)return min;
         return _succ(x);
     }
     bool lookup(int x){
-        if(x<0||x>= indexed_elements)return false;
+        if(x<0||x>=SQRT*SQRT)return false;
         return _lookup(x);
     }
     void insert (int x){
         if(lookup(x))return;
         _insert(x);
     }
-    int min_element(){return min;}
-    int max_element(){return max;}
     int is_empty(){return min==NON;}
     void erase(int x){
         if(!lookup(x))return;
@@ -181,14 +176,9 @@ class vEB: public genericvEB{
     vEB (int number_elements){
         SQRT=sqrt(number_elements);
         if(SQRT*SQRT<number_elements)SQRT++;
-        indexed_elements=number_elements;
         min=max=NON;
-        /*if(indexed_elements<=SMALL){
-            bits=0;
-            return;
-        }*/
-        if(indexed_elements<SMALL*SMALL){
-            int mitu=(indexed_elements+SMALL-1)/SMALL;
+        if(number_elements<SMALL*SMALL){
+            int mitu=(number_elements+SMALL-1)/SMALL;
             summary=new smallvEB();
             childs=new genericvEB*[mitu];
             SQRT=SMALL;
@@ -200,10 +190,18 @@ class vEB: public genericvEB{
             for(int i=0;i<SQRT;i++)childs[i]=new vEB(SQRT);
         }
     }
+
+     int get_min(){
+        return min;
+    }
+
+    int get_max(){
+        return max;
+    }
 };
 
 void prindi(vEB &see){
-    int u=see.max_element();
+    int u=see.get_max();
     while(u!=NON){
         cout<<u<<' ';
         u=see.pred(u);
