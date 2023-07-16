@@ -198,7 +198,7 @@ int main()
         int l=(rand()*rand())%N+1;
         int r=(rand()*rand())%N+1;
         if(l>r)swap(l,r);
-        assert(t.getSegmentSumBetweenVals(t.root,l,r)==(r-l+1));
+        assert(t.getSegmentSum(t.root,l,r)==(r-l+1));
     }
     //t.prindi();
     return 0;
