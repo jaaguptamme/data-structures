@@ -44,12 +44,14 @@ class Heap{
         }
     }
     void alla(int i){
-        int vaiksemi=i;
-        if((((i<<1)|1)<n)&&(a[(i<<1)|1]<a[vaiksemi]))vaiksemi=(i<<1)|1;
-        if((((i+1)<<1)<n)&&(a[((i+1)<<1)]<a[vaiksemi]))vaiksemi=(i+1)<<1;
-        if(vaiksemi!=i){
-            swap(a[vaiksemi],a[i]);
-            alla(vaiksemi);
+        while(((i<<1)|1)<n){
+            int vaiksemi=i;
+            if((((i<<1)|1)<n)&&(a[(i<<1)|1]<a[vaiksemi]))vaiksemi=(i<<1)|1;
+            if((((i+1)<<1)<n)&&(a[((i+1)<<1)]<a[vaiksemi]))vaiksemi=(i+1)<<1;
+            if(vaiksemi!=i){
+                swap(a[vaiksemi],a[i]);
+                i=vaiksemi;
+            }else return;
         }
     }
 };
