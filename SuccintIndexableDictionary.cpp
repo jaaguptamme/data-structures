@@ -12,6 +12,7 @@ struct SuccintIndexableDictionary{
         bit.assign(blocks,0U);
         sum.assign(blocks,0U);
     }
+    //set kth bit
     void set(int k){
         bit[k>>5]|=1U << (k&31);
     }
@@ -19,9 +20,11 @@ struct SuccintIndexableDictionary{
         sum[0]=0U;
         for(int i=1;i<blocks;i++)sum[i]=sum[i-1]+__builtin_popcount(bit[i-1]);
     }
+    //get val of kth bit
     bool operator[](int k){
         return (bool((bit[k>>5]>>(k&31))&1));
     }
+    //number of 1 bits set <k
     int rank(int k){
         return (sum[k>>5]+ __builtin_popcount(bit[k >> 5] & ((1U << (k & 31)) - 1)));
     }
