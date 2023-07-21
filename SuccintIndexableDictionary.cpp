@@ -5,6 +5,7 @@ struct SuccintIndexableDictionary{
     int len,blocks;
     typedef unsigned u;
     vector<u>bit,sum;
+    SuccintIndexableDictionary()=default;
     SuccintIndexableDictionary(int len){
         this->len=len;
         blocks=(len+31)>>5;
