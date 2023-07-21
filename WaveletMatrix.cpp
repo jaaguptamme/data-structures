@@ -34,6 +34,7 @@ struct WaveletMatrix{
     int len;
     SuccintIndexableDictionary mat[MXLOG];
     int mid[MXLOG];
+    WaveletMatrix()=default;
     WaveletMatrix(vector<T>& vec){
         len=vec.size();
         vector<T> l(len),r(len);
@@ -78,6 +79,7 @@ struct WaveletMatrix{
 
     //k,l,r are 0-based
     T kth_smallest(int l,int r,int k){
+        assert(0 <= k && k < r - l);
         T vas=0;
         for(int lev=MXLOG-1;lev>=0;lev--){
             int cnt=mat[lev].rank(0,r)-mat[lev].rank(0,l);
@@ -121,12 +123,66 @@ struct WaveletMatrix{
         return cnt==r-l?T(-1):kth_smallest(l,r,cnt);
     }
 };
+template<typename T,int MXLOG>
+struct CompressedWaveletMatrix{
+    WaveletMatrix<int,MXLOG>mat;
+    vector<T>vls;
+    CompressedWaveletMatrix(vector<T>& vec):vls(vec){
+        sort(vls.begin(),vls.end());
+        vls.erase(unique(vls.begin(),vls.end()),vls.end());
+        vector<int>nw(vec.size());
+        for(int i=0;i<vec.size();i++)nw[i]=get(vec[i]);
+        mat=WaveletMatrix<int,MXLOG>(nw);
+    }
+    int get(T& x){
+        return lower_bound(vls.begin(),vls.end(),x)-vls.begin();
+    }
+    T get_position(int k){
+        return vls[mat[k]];
+    }
+
+    T operator[](int &k){
+        return get_position(k);
+    }
+
+    int rank(T &k,int r){
+        auto ind=get(k);
+        if(ind==vls.size()||vls[ind]!=k)return 0;
+        return mat.rank(ind,r);
+    }
+
+    T kth_smallest(int l,int r,int k){
+        return vls[mat.kth_smallest(l,r,k)];
+    }
+
+    T kth_largest(int l,int r,int k){
+        return vls[mat.kth_largest(l,r,k)];
+    }
+
+    int range_freq(int l,int r,T up){
+        return mat.range_freq(l,r,get(up));
+    }
+
+    int range_freq(int l,int r,T low,T up){
+        return mat.range_freq(l,r,get(low),get(up));
+    }
+
+    T prev_val(int l,int r,T up){
+        auto vas=mat.prev_val(l,r,get(up));
+        return (vas==-1)?T(-1):vls[vas];
+    }
+
+    T next_val(int l,int r,T low){
+        auto vas=mat.next_val(l,r,get(low));
+        return (vas==-1)?T(-1):vls[vas];
+    }
+};
 int main()
 {ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);
     const int N=1000*1000;
     vector<int>a(N);
     for(int i=0;i<N;i++)a[i]=i;
-    WaveletMatrix<int,30>w(a);
+    CompressedWaveletMatrix<int,20>w(a);
     for(int i=0;i<N;i++){
         assert(w.get_position(i)==i);
     }
