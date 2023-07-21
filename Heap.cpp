@@ -36,22 +36,19 @@ class Heap{
     }
 
     void ules(int i){
-        while(i){
-            if(a[(i-1)>>1]>a[i]){
-                swap(a[i],a[(i-1)>>1]);
-                i=(i-1)>>1;
-            }else break;
+        if(i==0)return;
+        if(a[(i-1)/2]>a[i]){
+            swap(a[i],a[(i-1)/2]);
+            ules((i-1)/2);
         }
     }
     void alla(int i){
-        while(((i<<1)|1)<n){
-            int vaiksemi=i;
-            if((((i<<1)|1)<n)&&(a[(i<<1)|1]<a[vaiksemi]))vaiksemi=(i<<1)|1;
-            if((((i+1)<<1)<n)&&(a[((i+1)<<1)]<a[vaiksemi]))vaiksemi=(i+1)<<1;
-            if(vaiksemi!=i){
-                swap(a[vaiksemi],a[i]);
-                i=vaiksemi;
-            }else return;
+        int vaiksemi=i;
+        if((i*2+1<n)&&(a[i*2+1]<a[vaiksemi]))vaiksemi=i*2+1;
+        if((i*2+2<n)&&(a[i*2+2]<a[vaiksemi]))vaiksemi=i*2+2;
+        if(vaiksemi!=i){
+            swap(a[vaiksemi],a[i]);
+            alla(vaiksemi);
         }
     }
 };
