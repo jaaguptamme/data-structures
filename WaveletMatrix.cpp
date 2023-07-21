@@ -76,7 +76,6 @@ struct WaveletMatrix{
         for(int lev=MXLOG-1;lev>=0;lev--)tie(l,r)=succ((k>>lev)&1,l,r,lev);
         return r-l;
     }
-
     //k,l,r are 0-based
     T kth_smallest(int l,int r,int k){
         assert(0 <= k && k < r - l);
@@ -92,11 +91,9 @@ struct WaveletMatrix{
         }
         return vas;
     }
-
     T kth_largest(int l,int r,int k){
         return kth_smallest(l,r,r-l-k-1);
     }
-
     //count i such that l <=i < r and v[i]<up
     int range_freq(int l,int r,T up){
         int vas=0;
@@ -111,7 +108,6 @@ struct WaveletMatrix{
     int range_freq(int l,int r,T low,T up){
         return range_freq(l,r,up)-range_freq(l,r,low);
     }
-
     //maximal v[i] : v[i]<up
     T prev_val(int l,int r, T up){
         int cnt=range_freq(l,r,up);
@@ -134,44 +130,45 @@ struct CompressedWaveletMatrix{
         for(int i=0;i<vec.size();i++)nw[i]=get(vec[i]);
         mat=WaveletMatrix<int,MXLOG>(nw);
     }
+    //x->its compressed int
     int get(T& x){
         return lower_bound(vls.begin(),vls.end(),x)-vls.begin();
     }
+    //vec[k]
     T get_position(int k){
         return vls[mat[k]];
     }
-
+    //vec[k]
     T operator[](int &k){
         return get_position(k);
     }
-
+    //number of i<r:v[i]==k
     int rank(T &k,int r){
         auto ind=get(k);
         if(ind==vls.size()||vls[ind]!=k)return 0;
         return mat.rank(ind,r);
     }
-
+    //k,l,r are 0-based
     T kth_smallest(int l,int r,int k){
         return vls[mat.kth_smallest(l,r,k)];
     }
-
     T kth_largest(int l,int r,int k){
         return vls[mat.kth_largest(l,r,k)];
     }
-
+    //count i such that l <=i < r and v[i]<up
     int range_freq(int l,int r,T up){
         return mat.range_freq(l,r,get(up));
     }
-
+    //count i that (l<= i < r) and (low <= v[i] < up)
     int range_freq(int l,int r,T low,T up){
         return mat.range_freq(l,r,get(low),get(up));
     }
-
+    //maximal v[i] : v[i]<up, or -1
     T prev_val(int l,int r,T up){
         auto vas=mat.prev_val(l,r,get(up));
         return (vas==-1)?T(-1):vls[vas];
     }
-
+    //minimal v[i] : v[i]>=low, or -1
     T next_val(int l,int r,T low){
         auto vas=mat.next_val(l,r,get(low));
         return (vas==-1)?T(-1):vls[vas];
