@@ -54,7 +54,6 @@ PTT SPLIT_BY_CNT(T* RT,int x){
 }
 PTT SPLIT_BY_KEY(T* RT,int key){
     if(!RT)return {0,0};
-    UPD(RT);
     if(RT->key<=key){
         PTT Q=SPLIT_BY_KEY(RT->r,key);
         RT->r=Q.first;
