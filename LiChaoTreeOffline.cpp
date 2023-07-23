@@ -24,11 +24,8 @@ class LiChao{
         }
         if(kesk)swap(tipud[i],joon);
         if(l==r)return;
-        if(vasak!=kesk){
-            uuenda(i*2,l,m,joon);
-        }else{
-            uuenda(i*2+1,m+1,r,joon);
-        }
+        if(vasak!=kesk)uuenda(i*2,l,m,joon);
+        else uuenda(i*2+1,m+1,r,joon);
     }
 public:
     LiChao()=default;
@@ -65,15 +62,12 @@ public:
         add_segment(i*2,l,m,se,en,joon);
         add_segment(i*2+1,m+1,r,se,en,joon);
     }
-
     T saa(T x){
         int k=lower_bound(paringud.begin(),paringud.end(),x)-paringud.begin();
         return saa(1,0,size-1,k,x);
     }
     T saa(int i,int l,int r,int pos,T& x){
-        if(l==r){
-            return tipud[i](x);
-        }
+        if(l==r)return tipud[i](x);
         int m=(l+r)/2;
         if(pos<=m)return min(tipud[i](x),saa(i*2,l,m,pos,x));
         return min(tipud[i](x),saa(i*2+1,m+1,r,pos,x));
