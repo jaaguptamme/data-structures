@@ -7,7 +7,7 @@ struct DST{
     DST(vector<T>& a){
         int n=a.size();
         int hei=0;
-        while((1<<hei)<=n)hei++;
+        while((1<<hei)<n)hei++;
         hei++;
         table.resize(hei,vector<T>(n));
         for(int i=0;i<n;i++)table[0][i]=a[i];
