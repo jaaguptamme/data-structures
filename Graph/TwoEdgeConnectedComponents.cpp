@@ -65,21 +65,3 @@ public:
         }
     }
 };
-int main()
-{ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);
-    int n,m;
-    cin>>n>>m;
-    TwoEdgeConnectedComponents t(n);
-    for(int i=0;i<m;i++){
-        int a,b;cin>>a>>b;
-        t.add_edge(a,b,i);
-    }
-    auto v=t.build();
-    cout<<v.size()<<'\n';
-    for(auto e:v){
-        cout<<e.size()<<' ';
-        for(auto el:e)cout<<el<<' ';
-        cout<<'\n';
-    }
-    return 0;
-}
