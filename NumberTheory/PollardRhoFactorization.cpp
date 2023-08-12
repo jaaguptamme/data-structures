@@ -1,4 +1,5 @@
 #include <bits/stdc++.h>
+//works for q=100,n=10**18, in 4.4s
 typedef long long ll;
 using namespace std;
 struct MR{
