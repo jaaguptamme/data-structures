@@ -4,7 +4,7 @@
 typedef long long ll;
 using namespace std;
 template<typename T>
-class TwoTreeHeap{
+class TwoThreeHeap{
     vector<T> elems;
     int leafLev;
     vector<int>rowIndices;
@@ -23,7 +23,7 @@ class TwoTreeHeap{
         return {firstCh,firstCh+branching};
     }
     public:
-    TwoTreeHeap():leafLev(-1){
+    TwoThreeHeap():leafLev(-1){
         rowIndices = {0, 1, 3, 9, 27, 81, 189, 513, 1485, 4401, 10233, 27729,
     80217, 237681, 552609, 1497393, 4331745, 12834801, 29840913,
     80859249, 233914257,693079281};
@@ -68,7 +68,7 @@ class TwoTreeHeap{
 int main()
 {ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);
     const int N=1000*1000;
-    TwoTreeHeap<int>t;
+    TwoThreeHeap<int>t;
     for(int i=N-1;i>=0;i--)t.push(rand()*rand());
     for(int i=0;i<N;i++){
         t.pop();
