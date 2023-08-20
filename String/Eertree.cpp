@@ -1,4 +1,5 @@
 #include <bits/stdc++.h>
+//source: https://codeforces.com/blog/entry/13959
 typedef long long ll;
 using namespace std;
 template<typename T=char,T minChar='a',int diffChars=26>
