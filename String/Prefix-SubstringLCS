@@ -1,0 +1,64 @@
+#include <bits/stdc++.h>
+typedef long long ll;
+using namespace std;
+struct BIT{
+    vector<int>v;
+    int all;
+    BIT()=default;
+    BIT(int n):v(n+1,0),all(0){}
+    int get(int i){
+        int res=0;
+        for(i+=1;i>0;i-=i&-i)res+=v[i];
+        return res;
+    }
+    void add(int i,int vl){
+        all+=vl;
+        for(i+=1;i<v.size();i+=i&-i)v[i]+=vl;
+    }
+};
+ //get lentght of LCS of s(0...a-1) and T(b...c-1) offline for querys in
+template<typename T>
+struct PSLCS{
+    using P=pair<int,int>;
+    T s,t;
+    int qcnt;
+    vector<vector<vector<P>>> qs;
+    PSLCS(T& s,T& t):s(s),t(t),qcnt(0),qs(s.size(),vector<vector<P>>(t.size())){}
+    void addQ(int a,int b,int c){
+        if(a==0||c==0){
+            qcnt++;return;
+        }
+        qs[a-1][c-1].push_back({b,qcnt++});
+    }
+    vector<int>build(){
+        vector<int>h(t.size()),vas(qcnt);
+        iota(begin(h),end(h),0);
+        for(int a=0;a<s.size();a++){
+            int pr=-1;
+            for(int c=0;c<t.size();c++){
+                if(s[a]==t[c] or h[c]<pr)swap(h[c],pr);
+            }
+            BIT B(t.size()+1);
+            for(int c=0;c<t.size();c++){
+                if(h[c]!=-1)B.add(h[c],1);
+                for(auto [b,pos]:qs[a][c]){
+                    vas[pos]=(c-b+1)-(B.all-B.get(b-1));
+                }
+            }
+        }
+        return vas;
+    }
+};
+int main()
+{ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);
+    int q;
+    string s,t;
+    cin>>q>>s>>t;
+    PSLCS<string> T(s,t);
+    while(q--){
+        int a,b,c;cin>>a>>b>>c;
+        T.addQ(a,b,c);
+    }
+    for(auto el:T.build())cout<<el<<'\n';
+    return 0;
+}
