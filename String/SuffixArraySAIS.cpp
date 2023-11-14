@@ -1,7 +1,6 @@
 #include <bits/stdc++.h>
-
-using namespace std;
 typedef long long ll;
+using namespace std;
 struct SA{
     vector<int> sa_is(const vector<int>& s, int upper) {
         int n = s.size();
@@ -138,13 +137,25 @@ struct SA{
         for (char c : s) ns.emplace_back(c);
         return lcp_array(ns, sa);
     }
+    static tuple<int,int,int,int> lcp(const string&s,const string&t){
+        string all=s+'$'+t;
+        int n=s.size();
+        SA T;
+        auto sa=T.suffix_array(all);
+        auto lcpVec=T.lcp_array(all,sa);
+        tuple<int,int,int,int>res;
+        int resCnt=0;
+        for(int i=0;i<lcpVec.size();i++){
+            int lef=sa[i],rig=sa[i+1];
+            int vl=lcpVec[i];
+             if(lcpVec[i]>resCnt){
+                if((lef<n)xor(rig<n)){
+                    resCnt=lcpVec[i];
+                    if(lef<rig)res={lef,lef+vl,rig-n-1,rig+vl-n-1};
+                    else res={rig,rig+vl,lef-n-1,lef+vl-n-1};
+                }
+            }
+        }
+        return res;
+    }
 };
-int main()
-{ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);
-    string s;
-    cin>>s;
-    SA t;
-    auto v=t.suffix_array(s);
-    for(auto el:v)cout<<el<<' ';
-    return 0;
-}
