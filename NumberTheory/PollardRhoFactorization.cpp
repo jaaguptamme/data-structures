@@ -1,5 +1,5 @@
 #include <bits/stdc++.h>
-//works for q=100,n=10**18, in 4.4s
+//factors works for q=100,n=10**18, in 4.4s
 typedef long long ll;
 using namespace std;
 struct MR{
@@ -83,20 +83,34 @@ struct Floyd{
         l.insert(l.end(),r.begin(),r.end());
         return l;
     }
+    ll primitive_factor(ll p){
+        auto isOk=[&](ll n)->bool {
+            map<ll,int>mp;
+            for(auto x:rho(p-1))mp[x]++;
+            for(auto [q,e]:mp){
+                if(MR::binpower(n,(p-1)/q,p)==1){
+                    return false;
+                }
+            }
+            return true;
+        };
+        while(true){
+            ll n=rand()*rand()*rand()*rand()*rand();
+            n%=p;
+            if(n<0)n+=p;
+            if(n==0)continue;
+            if(isOk(n))return n;
+        }
+    }
 };
 int main()
 {ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);
-    Floyd f;
-    int q;
-    cin>>q;
-    while(q--){
-        ll a;
-        cin>>a;
-        vector<ll>facs=f.rho(a);
-        sort(facs.begin(),facs.end()),
-        cout<<facs.size()<<' ';
-        for(auto el:facs)cout<<el<<' ';
-        cout<<'\n';
+    int Q;
+    cin>>Q;
+    Floyd F;
+    while(Q--){
+        ll p;cin>>p;
+        cout<<F.primitive_factor(p)<<endl;
     }
     return 0;
 }
