@@ -1,0 +1,107 @@
+#include <bits/stdc++.h>
+typedef long long ll;
+using namespace std;
+template<typename T>
+class Puhi{
+    struct Tipp{
+        Tipp *v=nullptr,*p=nullptr;
+        T vaartus=0;
+        int kaal=0, suurus=1;
+        bool tagurpidi=false;
+        Tipp(){}
+        Tipp(T t, int k){
+            vaartus=t;
+            kaal=k;
+        }
+    };
+    int suurus(Tipp* TP){
+        if(TP)return TP->suurus;
+        return 0;
+    }
+    void uuenda(Tipp* TP){
+        TP->suurus=suurus(TP->v)+suurus(TP->p)+1;
+    }
+    void alla(Tipp* TP){
+        if(TP->tagurpidi){
+            swap(TP->v,TP->p);
+            if(TP->v)TP->v->tagurpidi=1-TP->v->tagurpidi;
+            if(TP->p)TP->p->tagurpidi=1-TP->p->tagurpidi;
+            TP->tagurpidi=0;
+        }
+    }
+    Tipp* juur;
+    typedef pair<Tipp*,Tipp*>PTT;
+    Tipp* kombineeri(Tipp* V,Tipp* P){
+        if(!V&&!P)return nullptr;
+        if(!V)return P;
+        if(!P)return V;
+        alla(V);alla(P);
+        if(V->kaal>P->kaal){
+            V->p=kombineeri(V->p,P);
+            uuenda(V);
+            return V;
+        }else{
+            P->v=kombineeri(V,P->v);
+            uuenda(P);
+            return P;
+        }
+    }
+    PTT jaga(Tipp* TP, int mitu){
+        if(!TP)return {nullptr,nullptr};
+        alla(TP);
+        if(suurus(TP->v)+1<=mitu){
+            PTT Q=jaga(TP->p,mitu-suurus(TP->v)-1);
+            TP->p=Q.first;
+            uuenda(TP);
+            return {TP,Q.second};
+        }else{
+            PTT Q=jaga(TP->v,mitu);
+            TP->v=Q.second;
+            uuenda(TP);
+            return {Q.first, TP};
+        }
+    }
+public:
+    Puhi(){
+        juur=nullptr;
+    }
+    void lisa(T t, bool algus){
+        Tipp* TP=new Tipp(t,rand()*rand());
+        if(algus)juur=kombineeri(TP,juur);
+        else juur=kombineeri(juur,TP);
+    }
+    void eemalda(bool algus){
+        if(algus==true){
+            juur=jaga(juur,1).second;
+        }else{
+            juur=jaga(juur,suurus(juur)-1).first;
+        }
+    }
+    T saa(int koht){
+        PTT Q1=jaga(juur,koht+1);
+        PTT Q2=jaga(Q1.first,koht);
+        T t=Q2.second->vaartus;
+        juur=kombineeri(Q2.first,kombineeri(Q2.second,Q1.second));
+        return t;
+    }
+};
+int main()
+{ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);
+    int Q;
+    cin>>Q;
+    Puhi<int> P;
+    while(Q--){
+        int op;
+        cin>>op;
+        if(op==0||op==1){
+            int x;cin>>x;
+            P.lisa(x,op==0);
+        }else if(op==2||op==3){
+            P.eemalda(op==2);
+        }else{
+            int i;cin>>i;
+            cout<<P.saa(i)<<'\n';
+        }
+    }
+    return 0;
+}
