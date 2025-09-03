@@ -1,0 +1,81 @@
+//testitud :https://judge.yosupo.jp/problem/static_range_sum_with_upper_bound
+#include <bits/stdc++.h>
+typedef long long ll;
+using namespace std;
+
+/**ingl Merge sort tree
+Lõikude puu laiendus.
+Hoiab tippudes sorteeritult alampuu väärtusi
+
+Võimalab päringuid:
+* kui palju on vahemikus [l,r] arve, mis on väiksemad/suuremad kui x ajaga O(log^2 N)
+või nende summa/korrutis/...
+
+Ehitamine keerukusega O(N log N), mälu samuti O(N log N)
+N=5e5 ~ 2s
+*/
+struct MST{
+    vector<int>a;
+    vector<vector<int>>vaartused;
+    vector<vector<ll>>algusSummad;
+    int N;
+    MST(vector<int>a):a(a){
+        N=a.size();
+        vaartused.resize(4*N);algusSummad.resize(4*N);
+        ehita(1,0,N-1);
+    }
+    void ehita(int i,int l,int r){
+        if(l==r){
+            vaartused[i]={a[l]};
+            algusSummad[i]={a[l]};
+            return;
+        }
+        int m=(l+r)/2;
+        ehita(i*2,l,m);
+        ehita(i*2+1,m+1,r);
+        merge(vaartused[i*2].begin(),vaartused[i*2].end(),
+              vaartused[i*2+1].begin(),vaartused[i*2+1].end(),
+              back_inserter(vaartused[i]));
+        ll sum=0;
+        for(auto& el:vaartused[i]){
+            sum+=el;
+            algusSummad[i].push_back(sum);
+        }
+    }
+    pair<ll,ll> saa(int i,int mx){
+        auto koht=upper_bound(vaartused[i].begin(),vaartused[i].end(),mx)-vaartused[i].begin();
+        if(koht==0)return {0,0};
+        return {koht,algusSummad[i][koht-1]};
+    }
+    pair<ll,ll> paring(int se,int en,int mx){// 0<=l<=r<N, leiab vastuse paringule vahemikul [l,r]
+        if(se>en)return {0,0};
+        return paring(1,0,N-1,se,en,mx);
+    }
+    pair<ll,ll> komb(const pair<ll,ll>&a,const pair<ll,ll>&b){
+        return {a.first+b.first,a.second+b.second};
+    }
+    pair<ll,ll> paring(int i, int l,int r, int se, int en, int mx){
+        if(se<=l&&r<=en){
+            return saa(i,mx);
+        }
+        int m=(l+r)/2;
+        if(en<=m)return paring(i*2,l,m,se,en,mx);
+        else if(se>m)return paring(i*2+1,m+1,r,se,en,mx);
+        return komb(paring(i*2,l,m,se,en,mx),paring(i*2+1,m+1,r,se,en,mx));
+    }
+};
+int main()
+{ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);
+    int N,Q;
+    cin>>N>>Q;
+    vector<int>a(N);
+    for(auto &i:a)cin>>i;
+    MST T(a);
+    while(Q--){
+        int l,r,x;
+        cin>>l>>r>>x;
+        auto el=T.paring(l,r-1,x);
+        cout<<el.first<<' '<<el.second<<'\n';
+    }
+    return 0;
+}
